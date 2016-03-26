@@ -282,7 +282,7 @@ lengthGT4 ::
   List a
   -> Bool
 lengthGT4 (_ :. _ :. _ :. _ :. _ :. _)= True
-lengthGT4 xs = False
+lengthGT4 _ = False
 
 -- | Reverse a list.
 --
@@ -299,7 +299,7 @@ reverse ::
   List a
   -> List a
 reverse Nil = Nil
-reverse xs = foldRight (:.) Nil xs
+reverse xs = foldLeft (flip (:.)) Nil xs
 
 
 -- | Produce an infinite `List` that seeds with the given value at its head,
