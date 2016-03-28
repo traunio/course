@@ -62,40 +62,44 @@ the contents of c
 main ::
   IO ()
 main =
-  error "todo: Course.FileIO#main"
+  getArgs >>= \args ->
+    case args of
+      filename :. Nil -> run filename
+      _ -> putStrLn "usage: runhaskell io.hs filename"
 
 type FilePath =
   Chars
+
 
 -- /Tip:/ Use @getFiles@ and @printFiles@.
 run ::
   Chars
   -> IO ()
-run =
-  error "todo: Course.FileIO#run"
+run name = readFile name >>= getFiles . lines >>= printFiles
 
 getFiles ::
   List FilePath
   -> IO (List (FilePath, Chars))
-getFiles =
-  error "todo: Course.FileIO#getFiles"
+getFiles = sequence . (<$>) getFile
 
 getFile ::
   FilePath
   -> IO (FilePath, Chars)
-getFile =
-  error "todo: Course.FileIO#getFile"
+getFile x = do
+    cont <- readFile x
+    return (x, cont)
 
 printFiles ::
   List (FilePath, Chars)
   -> IO ()
-printFiles =
-  error "todo: Course.FileIO#printFiles"
+printFiles = void . sequence . (<$>) (uncurry printFile) 
+    
 
 printFile ::
   FilePath
   -> Chars
   -> IO ()
-printFile =
-  error "todo: Course.FileIO#printFile"
+printFile x cont = do 
+    putStrLn ("============ " ++ x)
+    putStrLn cont 
 
