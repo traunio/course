@@ -64,10 +64,10 @@ instance Applicative (State s) where
     -> State s a
     -> State s b 
   State f <*> State k = State (\s -> 
-                let (a,t) = k s 
-                    (h,u) = f t
-                in (h a,u))
-
+                let (a,t) = f s 
+                    (h,u) = k t
+                in (a h,u))
+                
 
 -- | Implement the `Bind` instance for `State s`.
 --
@@ -161,20 +161,9 @@ firstRepeat ::
   Ord a =>
   List a
   -> Optional a
-firstRepeat = listWithState findM S.member
+firstRepeat as = eval (findM p as) S.empty
+    where p a = State (\s -> if S.member a s then (True, s) else (False, S.insert a s))
 
-
-listWithState :: 
-  Ord a1 =>
-  ((a1 -> State (S.Set a1) a2) 
-  -> t 
-  -> State (S.Set a3) a)
-  -> (a1 -> S.Set a1 -> a2) 
-  -> t 
-  -> a 
-listWithState f m x = eval (f (State . lift2 (lift2 (,)) m S.insert) x) S.empty
-
- 
 -- | Remove all duplicate elements in a `List`.
 -- /Tip:/ Use `filtering` and `State` with a @Data.Set#Set@.
 --
@@ -185,7 +174,8 @@ distinct ::
   Ord a =>
   List a
   -> List a
-distinct = listWithState filtering S.notMember 
+distinct xs = eval (filtering p xs) S.empty
+    where p a = State (\s -> if S.member a s then (False, s) else (True, S.insert a s))
 
 
 -- | A happy number is a positive integer, where the sum of the square of its digits eventually reaches 1 after repetition.
