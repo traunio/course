@@ -634,11 +634,8 @@ instance Applicative Parser where
     Parser (a -> b)
     -> Parser a
     -> Parser b
-  (<*>) fpar par =
-    flbindParser par (\a ->
-    flbindParser fpar (\f ->
-                        valueParser (f a)))
-
+  p <*> q =
+    bindParser (\f -> bindParser (valueParser . f) q) p
 
 -- | Write a Monad instance for a @Parser@.
 instance Monad Parser where
